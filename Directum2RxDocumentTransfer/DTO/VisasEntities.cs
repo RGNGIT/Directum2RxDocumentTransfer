@@ -50,5 +50,10 @@ namespace Directum2RxDocumentTransfer.DTO
             public string TimeInWork { get; set; }
             public string Result { get; set; }
         }
+
+        public class VisasWebRequest
+        {
+            public VisasListData data {  get; set; }
+        }
     }
 }

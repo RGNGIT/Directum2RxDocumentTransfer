@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using System.Threading;
 using ABI.System;
 using Microsoft.VisualBasic.Logging;
+using System.Net.Http.Json;
+using Newtonsoft.Json;
+using System.Net.Mime;
 
 namespace Directum2RxDocumentTransfer.Utils
 {
@@ -21,16 +24,16 @@ namespace Directum2RxDocumentTransfer.Utils
 
         public static Dictionary<Endpoint, string> endpointMap { get; set; } = new Dictionary<Endpoint, string>();
 
-        public async static Task<string?> SendRequest(string body, Endpoint endpoint)
+        public async static Task<string?> SendRequest(object body, Endpoint endpoint)
         {
-            Logger.Debug($"SendRequest. Body: {body}. Endpoint: {endpoint}");
+            Logger.Debug($"SendRequest. Body: {JsonConvert.SerializeObject(body)}. Endpoint: {endpoint}");
             var headers = new Dictionary<string, string>()
             {
                 { "Authorization", credentials }
             };
             using (var client = new HttpClient())
             {
-                var requestContent = new StringContent(body, Encoding.UTF8, "text/plain");
+                var requestContent = JsonContent.Create(body);
 
                 if (headers != null)
                     foreach (var header in headers)
@@ -50,7 +53,7 @@ namespace Directum2RxDocumentTransfer.Utils
                 {
                     var responseString = await response.Content.ReadAsStringAsync();
                     Logger.Debug($"SendRequest. Error: {responseString}");
-                    return null;
+                    return "Bullshit";
                 }
             }
         }

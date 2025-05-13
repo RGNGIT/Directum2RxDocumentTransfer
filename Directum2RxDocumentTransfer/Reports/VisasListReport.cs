@@ -89,7 +89,7 @@ namespace Directum2RxDocumentTransfer.Reports
             reportData.Approvers = approvers;
             reportData.Signatories = signatures;
 
-            var sendResult = Networking.SendRequest(JsonConvert.SerializeObject(new { stringifiedData = JsonConvert.SerializeObject(reportData) }), Networking.Endpoint.Visas).Result;
+            var sendResult = Networking.SendRequest(new VisasEntities.VisasWebRequest() { data = reportData }, Networking.Endpoint.Visas).Result;
             Logger.Debug($"GetReportDataAndSendToDirectumRX. ResultSent. Status: {sendResult}");
         }
     }
