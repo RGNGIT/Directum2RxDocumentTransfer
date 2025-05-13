@@ -34,9 +34,9 @@ namespace Directum2RxDocumentTransfer.Utils
                 AND l.id IS NULL
                 ORDER BY d.XRecID DESC
                 OFFSET {0} ROWS FETCH NEXT {1} ROWS ONLY;";
-        }
+            public static string TaskInitiatorScalarCommand = @"SELECT TOP(1) a.NameAn FROM MBAnalit a, SBTask b WHERE a.XRecID = b.Author AND b.XRecID = {0};";
 
-        public static string VisasListDataCommand = @"SELECT u.Dop3 AS ExecutorName,
+            public static string VisasListDataCommand = @"SELECT u.Dop3 AS ExecutorName,
        (SELECT unit.Prim
         FROM MBAnalit unit
         WHERE unit.Analit = (SELECT TOP 1 w.Podr
@@ -73,5 +73,6 @@ WHERE r.TaskID IN (SELECT XRecID
       u.Analit = j.Executor AND
       (j.ResultTitle IS NULL OR j.ResultTitle <> 'На доработку')
 ORDER BY j.EndDate DESC";
+        }
     }
 }
