@@ -12,10 +12,10 @@ namespace Directum2RxDocumentTransfer.Reports
 {
     public class VisasListReport
     {
-        public void GetReportDataAndSendToDirectumRX(int taskId, int documentId, int rabCode)
+        public void GetReportDataAndSendToDirectumRX(int? taskId, int? documentId, int? rabCode)
         {
             var reportData = new VisasEntities.VisasListData();
-            reportData.MainDocument = documentId;
+            reportData.MainDocument = 1;
             // Найдем автора этого документа (инициатор задачи)
             using (var connection = SQL.SqlHandler.CreateNewConnection())
             {
@@ -51,8 +51,8 @@ namespace Directum2RxDocumentTransfer.Reports
                                 Executor = reader.GetValue(0) as string,
                                 Department = reader.GetValue(1) as string,
                                 Substitute = reader.GetValue(2) as string,
-                                StartDate = reader.GetValue(3) as string,
-                                EndDate = reader.GetValue(4) as string,
+                                StartDate = reader.GetDateTime(3).ToString("dd.MM.yyyy HH:mm.ss"),
+                                EndDate = reader.GetDateTime(4).ToString("dd.MM.yyyy HH:mm.ss"),
                                 WorkingTime = reader.GetValue(5) as string,
                                 Result = reader.GetValue(6) as string
                             });
@@ -89,7 +89,7 @@ namespace Directum2RxDocumentTransfer.Reports
             reportData.Approvers = approvers;
             reportData.Signatories = signatures;
 
-            var sendResult = Networking.SendRequest(JsonConvert.SerializeObject(new { data = JsonConvert.SerializeObject(reportData) }), Networking.Endpoint.Visas).Result;
+            var sendResult = Networking.SendRequest(JsonConvert.SerializeObject(new { stringifiedData = JsonConvert.SerializeObject(reportData) }), Networking.Endpoint.Visas).Result;
             Logger.Debug($"GetReportDataAndSendToDirectumRX. ResultSent. Status: {sendResult}");
         }
     }

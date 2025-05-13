@@ -25,7 +25,7 @@ namespace Directum2RxDocumentTransfer
 
             Console.WriteLine("Установка эндпоинтов...");
             var visasEndpointNode = xmlDoc.SelectSingleNode("/Config/VisasEndpoint");
-            Networking.visasEndpoint = visasEndpointNode?.InnerText;
+            Networking.endpointMap.Add(Networking.Endpoint.Visas, visasEndpointNode?.InnerText);
 
             Console.WriteLine("Установка кредов...");
             var credentialsNode = xmlDoc.SelectSingleNode("/Config/Credentials");
@@ -42,13 +42,15 @@ namespace Directum2RxDocumentTransfer
             // Лист визирования
             var visasHandler = new VisasListReport();
             foreach (var item in data)
-                visasHandler.GetReportDataAndSendToDirectumRX((int)item.TaskID!, (int)item.DocumentId!, 288);
+                visasHandler.GetReportDataAndSendToDirectumRX(item.TaskID, item.DocumentId, 288);
         }
 
         static void Main()
         {
             Initialize();
             FormReports();
+
+            Console.ReadKey();
         }
     }
 }

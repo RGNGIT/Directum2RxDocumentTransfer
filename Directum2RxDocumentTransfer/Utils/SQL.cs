@@ -19,7 +19,7 @@ namespace Directum2RxDocumentTransfer.Utils
         public static class SqlCommands
         {
             public static string FormListCommand = @"
-                SELECT DISTINCT d.XRecID, a.TaskID, l.id, l.mes
+                SELECT DISTINCT TOP(100) d.XRecID, a.TaskID, l.id, l.mes
                 FROM SBEDoc d
                 LEFT JOIN SBTaskAttach a ON d.XRecID = a.AttachID
                 LEFT JOIN SBTask t ON t.XRecID = a.TaskID
@@ -32,8 +32,7 @@ namespace Directum2RxDocumentTransfer.Utils
                                       113532, 1969563, 206596, 2399164)
                 AND t.State = 'D'
                 AND l.id IS NULL
-                ORDER BY d.XRecID DESC
-                OFFSET {0} ROWS FETCH NEXT {1} ROWS ONLY;";
+                ORDER BY d.XRecID DESC;";
             public static string TaskInitiatorScalarCommand = @"SELECT TOP(1) a.NameAn FROM MBAnalit a, SBTask b WHERE a.XRecID = b.Author AND b.XRecID = {0};";
 
             public static string VisasListDataCommand = @"SELECT u.Dop3 AS ExecutorName,
@@ -72,7 +71,7 @@ WHERE r.TaskID IN (SELECT XRecID
       j.XRecID = r.JobID AND
       u.Analit = j.Executor AND
       (j.ResultTitle IS NULL OR j.ResultTitle <> 'На доработку')
-ORDER BY j.EndDate DESC";
+ORDER BY j.EndDate DESC;";
         }
     }
 }

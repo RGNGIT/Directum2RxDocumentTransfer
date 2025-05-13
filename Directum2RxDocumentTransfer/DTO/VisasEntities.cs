@@ -22,7 +22,7 @@ namespace Directum2RxDocumentTransfer.DTO
 
         public class VisasListData
         {
-            public long MainDocument { get; set; }
+            public long? MainDocument { get; set; }
             public string DocumentName { get; set; }
             public string DocumentPerformer { get; set; }
             public List<VisasListApprover> Approvers { get; set; }

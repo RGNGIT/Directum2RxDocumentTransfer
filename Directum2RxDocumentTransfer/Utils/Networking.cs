@@ -17,29 +17,29 @@ namespace Directum2RxDocumentTransfer.Utils
         }
 
         public static string? baseUrl { get; set; } = string.Empty;
-        public static string? visasEndpoint { get; set; } = string.Empty;
         public static string? credentials { get; set; } = string.Empty;
 
-        public static Dictionary<Endpoint, string> endpointMap { get; set; } = new Dictionary<Endpoint, string>()
-        {
-            { Endpoint.Visas, visasEndpoint }
-        };
+        public static Dictionary<Endpoint, string> endpointMap { get; set; } = new Dictionary<Endpoint, string>();
 
         public async static Task<string?> SendRequest(string body, Endpoint endpoint)
         {
+            Logger.Debug($"SendRequest. Body: {body}. Endpoint: {endpoint}");
             var headers = new Dictionary<string, string>()
             {
                 { "Authorization", credentials }
             };
             using (var client = new HttpClient())
             {
-                var requestContent = new StringContent(body, Encoding.UTF8, "application/json");
+                var requestContent = new StringContent(body, Encoding.UTF8, "text/plain");
 
                 if (headers != null)
                     foreach (var header in headers)
                         client.DefaultRequestHeaders.Add(header.Key, header.Value);
 
-                var response = await client.PostAsync($"{baseUrl}/{endpointMap[endpoint]}", requestContent);
+                var url = $"{baseUrl}/{endpointMap[endpoint]}";
+                Logger.Debug($"SendRequest. Url: {url}");
+
+                var response = await client.PostAsync(url, requestContent);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -47,7 +47,11 @@ namespace Directum2RxDocumentTransfer.Utils
                     return responseString;
                 }
                 else
+                {
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    Logger.Debug($"SendRequest. Error: {responseString}");
                     return null;
+                }
             }
         }
     }
