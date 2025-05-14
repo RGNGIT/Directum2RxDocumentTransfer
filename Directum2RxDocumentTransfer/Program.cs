@@ -1,3 +1,4 @@
+using Directum2RxDocumentTransfer.DTO;
 using Directum2RxDocumentTransfer.Reports;
 using Directum2RxDocumentTransfer.Utils;
 using System.Data.SqlTypes;
@@ -45,9 +46,69 @@ namespace Directum2RxDocumentTransfer
                 visasHandler.GetReportDataAndSendToDirectumRX(item.TaskID, item.DocumentId, 288);
         }
 
+        static void Test()
+        {
+            var objectToSend = new VisasEntities.VisasListData()
+            {
+                MainDocument = 123,
+                DocumentName = "Sas",
+                DocumentPerformer = "Sos",
+                Approvers = new List<VisasEntities.VisasListApprover>() 
+                { 
+                    new VisasEntities.VisasListApprover() 
+                    {
+                        Visioner = "Согласовович Согласуй Согласуев",
+                        Department = "Подразделение не ваших собачих дел",
+                        Substitute = "Пупов Пупа Пупович",
+                        AssignmentStartDate = "04.05.2001 00:00",
+                        AssignmentCompleteDate = "04.05.2001 00:00",
+                        TimeInWork = "00:00",
+                        Result = "Согласовано"
+                    },
+                    new VisasEntities.VisasListApprover()
+                    {
+                        Visioner = "Согласовович Согласуй Согласуев",
+                        Department = "Подразделение не ваших собачих дел",
+                        Substitute = "Пупов Пупа Пупович",
+                        AssignmentStartDate = "04.05.2001 00:00",
+                        AssignmentCompleteDate = "04.05.2001 00:00",
+                        TimeInWork = "00:00",
+                        Result = "Согласовано"
+                    }
+                },
+                Signatories = new List<VisasEntities.VisasListSignatory>() 
+                {
+                    new VisasEntities.VisasListSignatory()
+                    {
+                        Signatory = "Согласовович Согласуй Согласуев",
+                        Department = "Подразделение не ваших собачих дел",
+                        Substitute = "Пупов Пупа Пупович",
+                        AssignmentStartDate = "04.05.2001 00:00",
+                        AssignmentCompleteDate = "04.05.2001 00:00",
+                        TimeInWork = "00:00",
+                        Result = "Согласовано"
+                    },
+                    new VisasEntities.VisasListSignatory()
+                    {
+                        Signatory = "Согласовович Согласуй Согласуев",
+                        Department = "Подразделение не ваших собачих дел",
+                        Substitute = "Пупов Пупа Пупович",
+                        AssignmentStartDate = "04.05.2001 00:00",
+                        AssignmentCompleteDate = "04.05.2001 00:00",
+                        TimeInWork = "00:00",
+                        Result = "Согласовано"
+                    }
+                }
+            };
+
+            var result = Networking.SendRequest(new VisasEntities.VisasWebRequest() { data = objectToSend }, Networking.Endpoint.Visas).Result;
+            Console.WriteLine(result);
+        }
+
         static void Main()
         {
             Initialize();
+            // Test();
             FormReports();
 
             Console.ReadKey();

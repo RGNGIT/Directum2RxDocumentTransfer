@@ -9,6 +9,7 @@ using Microsoft.VisualBasic.Logging;
 using System.Net.Http.Json;
 using Newtonsoft.Json;
 using System.Net.Mime;
+using RestSharp;
 
 namespace Directum2RxDocumentTransfer.Utils
 {
@@ -27,34 +28,35 @@ namespace Directum2RxDocumentTransfer.Utils
         public async static Task<string?> SendRequest(object body, Endpoint endpoint)
         {
             Logger.Debug($"SendRequest. Body: {JsonConvert.SerializeObject(body)}. Endpoint: {endpoint}");
-            var headers = new Dictionary<string, string>()
+            Logger.Debug($"SendRequest. Url: {baseUrl}/{endpointMap[endpoint]}");
+
+            var client = new RestClient(baseUrl);
+            var request = new RestRequest($"/{endpointMap[endpoint]}", Method.Post);
+
+            var jsonBody = JsonConvert.SerializeObject(body);
+            request.AddParameter("application/json", jsonBody, ParameterType.RequestBody);
+
+            request.AddHeader("Authorization", credentials);
+            request.AddHeader("Content-Type", "application/json");
+
+            try
             {
-                { "Authorization", credentials }
-            };
-            using (var client = new HttpClient())
-            {
-                var requestContent = JsonContent.Create(body);
+                var response = await client.ExecuteAsync(request);
 
-                if (headers != null)
-                    foreach (var header in headers)
-                        client.DefaultRequestHeaders.Add(header.Key, header.Value);
-
-                var url = $"{baseUrl}/{endpointMap[endpoint]}";
-                Logger.Debug($"SendRequest. Url: {url}");
-
-                var response = await client.PostAsync(url, requestContent);
-
-                if (response.IsSuccessStatusCode)
+                if (response.IsSuccessful)
                 {
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    return responseString;
+                    return response.Content;
                 }
                 else
                 {
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    Logger.Debug($"SendRequest. Error: {responseString}");
+                    Logger.Debug($"SendRequest. Error: {response.Content}");
                     return "Bullshit";
                 }
+            }
+            catch (System.Exception ex)
+            {
+                Logger.Debug($"SendRequest. Exception: {ex.Message}");
+                return null;
             }
         }
     }
