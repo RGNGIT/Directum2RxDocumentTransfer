@@ -27,12 +27,39 @@ namespace Directum2RxDocumentTransfer
             Console.WriteLine("Установка эндпоинтов...");
             var visasEndpointNode = xmlDoc.SelectSingleNode("/Config/VisasEndpoint");
             Networking.endpointMap.Add(Networking.Endpoint.Visas, visasEndpointNode?.InnerText);
+            var remarksEndpointNode = xmlDoc.SelectSingleNode("/Config/RemarksEndpoint");
+            Networking.endpointMap.Add(Networking.Endpoint.Remarks, remarksEndpointNode?.InnerText);
 
             Console.WriteLine("Установка кредов...");
             var credentialsNode = xmlDoc.SelectSingleNode("/Config/Credentials");
             Networking.credentials = credentialsNode?.InnerText;
 
+            Console.WriteLine("Создание системной таблицы...");
+            SQL.SqlHandler.CreateSystemTableIfNotExists();
+
             Console.WriteLine("Инициализация завершена.");
+        }
+
+        static void FormVisasListReport(DataListEntity item) 
+        {
+            //if (SQL.SqlHandler.ExistsInSystemTable((int)item.TaskID!, "Visas"))
+            //    return;
+
+            var visasHandler = new VisasListReport();
+            visasHandler.GetReportDataAndSendToDirectumRX(item.TaskID, item.DocumentId, 288);
+
+            //SQL.SqlHandler.InsertIntoSystemTable((int)item.TaskID!, "Visas");
+        }
+
+        static void FormRemarksListReport(DataListEntity item) 
+        {
+            //if (SQL.SqlHandler.ExistsInSystemTable((int)item.TaskID!, "Remarks"))
+            //    return;
+
+            var remarksHandler = new RemarksListReport();
+            remarksHandler.GetReportDataAndSendToDirectumRX(item.TaskID, item.DocumentId);
+
+            //SQL.SqlHandler.InsertIntoSystemTable((int)item.TaskID!, "Remarks");
         }
 
         static void FormReports() 
@@ -40,10 +67,11 @@ namespace Directum2RxDocumentTransfer
             // Данные всякие
             var formDataUtil = new FormDataList(1, 1);
             var data = formDataUtil.GetDataList();
-            // Лист визирования
-            var visasHandler = new VisasListReport();
             foreach (var item in data)
-                visasHandler.GetReportDataAndSendToDirectumRX(item.TaskID, item.DocumentId, 288);
+            {
+                FormVisasListReport(item);
+                FormRemarksListReport(item);
+            }
         }
 
         static void Test()

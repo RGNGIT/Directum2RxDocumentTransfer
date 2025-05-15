@@ -17,7 +17,8 @@ namespace Directum2RxDocumentTransfer.Utils
     {
         public enum Endpoint
         {
-            Visas
+            Visas,
+            Remarks
         }
 
         public static string? baseUrl { get; set; } = string.Empty;

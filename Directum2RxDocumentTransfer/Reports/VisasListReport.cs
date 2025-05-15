@@ -15,7 +15,7 @@ namespace Directum2RxDocumentTransfer.Reports
         public void GetReportDataAndSendToDirectumRX(int? taskId, int? documentId, int? rabCode)
         {
             var reportData = new VisasEntities.VisasListData();
-            reportData.MainDocument = 1;
+            reportData.MainDocument = documentId ?? -1;
             // Найдем автора этого документа (инициатор задачи)
             using (var connection = SQL.SqlHandler.CreateNewConnection())
             {
@@ -32,7 +32,7 @@ namespace Directum2RxDocumentTransfer.Reports
                 }
             }
             // Найдем нейм документа
-            reportData.DocumentName = "Пока что тестовый";
+            reportData.DocumentName = "Пока что тестовый Визас";
             // Найдем все данные таблицы
             var visasCommonEntities = new List<VisasEntities.VisasItemCommonEntity>();
             using (var connection = SQL.SqlHandler.CreateNewConnection())

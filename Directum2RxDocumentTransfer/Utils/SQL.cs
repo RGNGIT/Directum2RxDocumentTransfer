@@ -14,10 +14,56 @@ namespace Directum2RxDocumentTransfer.Utils
             public static string? connectionString { get; set; } = string.Empty;
 
             public static SqlConnection CreateNewConnection() => new SqlConnection(connectionString);
+
+            public static void CreateSystemTableIfNotExists()
+            {
+                using (var connection = CreateNewConnection())
+                {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(SqlCommands.CreateSystemTable, connection))
+                        command.ExecuteNonQuery();
+                }
+            }
+
+            public static void InsertIntoSystemTable(int taskId, string reportType)
+            {
+                using (var connection = CreateNewConnection())
+                {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(string.Format(SqlCommands.InsertIntoSystemTable, taskId, reportType), connection))
+                        command.ExecuteNonQuery();
+                }
+            }
+
+            public static bool ExistsInSystemTable(int taskId, string reportType) 
+            {
+                using (var connection = CreateNewConnection())
+                {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(string.Format(SqlCommands.CountFromSystemTable, taskId, reportType), connection))
+                    {
+                        var result = command.ExecuteScalar();
+                        return (int)result > 0;
+                    }
+                }
+            }
         }
 
         public static class SqlCommands
         {
+            public static string CountFromSystemTable = @"SELECT COUNT(*) FROM CentrVD_DocTransfer_ProcessedTasks WHERE TaskId = '{0}' AND ReportType = '{1}';";
+
+            public static string InsertIntoSystemTable = @"INSERT INTO CentrVD_DocTransfer_ProcessedTasks (TaskId, ReportType) VALUES ('{0}', '{1}');";
+
+            public static string CreateSystemTable = @"IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'CentrVD_DocTransfer_ProcessedTasks')
+BEGIN
+    CREATE TABLE CentrVD_DocTransfer_ProcessedTasks
+    (
+        [TaskId] int,
+        [ReportType] nvarchar(max)
+    )
+END;";
+
             public static string FormListCommand = @"
                 SELECT DISTINCT TOP(100) d.XRecID, a.TaskID, l.id, l.mes
                 FROM SBEDoc d
@@ -34,6 +80,24 @@ namespace Directum2RxDocumentTransfer.Utils
                 AND l.id IS NULL
                 ORDER BY d.XRecID DESC;";
             public static string TaskInitiatorScalarCommand = @"SELECT TOP(1) a.NameAn FROM MBAnalit a, SBTask b WHERE a.XRecID = b.Author AND b.XRecID = {0};";
+
+            public static string RemarksListDataCommand = @"select u.Dop3, 
+                         j.ResultTitle, 
+                         r.MarksDocID,
+                         d.Name,
+                         t.Text,
+                         j.StartDate 
+                  from RSNReportInfo r
+                       left join SBEDoc d on (d.XRecID = r.MarksDocID), 
+                       SBTaskJob j, 
+                       MBAnalit u,
+                       SBTaskText t
+                  where r.TaskID in (select XRecID from SBTask where XRecID = {0} or MainTaskID = {0}) and
+                        j.XRecID = r.JobID and
+                        u.Analit = j.Executor and
+                        t.JobID = r.JobID and
+                        j.ResultTitle in ('Согласовано с замечаниями', 'Замечания сняты', 'Согласовано с замечаниями в документе', 'Не согласовано', 'За', 'Против', 'Воздержался', 'На доработку')
+                  order by j.StartDate asc, t.TextLastUpd asc;";
 
             public static string VisasListDataCommand = @"SELECT u.Dop3 AS ExecutorName,
        (SELECT unit.Prim
