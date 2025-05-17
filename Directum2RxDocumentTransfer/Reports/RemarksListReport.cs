@@ -31,13 +31,18 @@ namespace Directum2RxDocumentTransfer.Reports
                             {
                                 Performer = reader.GetValue(0) as string,
                                 Result = reader.GetValue(1) as string,
+                                MarkDocId = reader.GetInt32(2),
+                                MarkDocName = reader.GetValue(3) as string,
                                 Remark = reader.GetValue(4) != null ? Misc.GetStringInEncoding(reader.GetValue(4).ToString(), "Windows-1251") : null
                             });
                 }
             }
 
+            if (!remarksListLinesEntities.Any())
+                return;
+
             // Найдем нейм документа
-            reportData.DocumentName = "Пока что тестовый Ремарк";
+            reportData.DocumentName = $"Пока что тестовый Ремарк {taskId}";
 
             reportData.Lines = remarksListLinesEntities;
             var sendResult = Networking.SendRequest(new RemarksEntities.RemarksWebRequest() { data = reportData }, Networking.Endpoint.Remarks).Result;

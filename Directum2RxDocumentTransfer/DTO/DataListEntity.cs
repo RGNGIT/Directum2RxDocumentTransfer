@@ -12,5 +12,6 @@ namespace Directum2RxDocumentTransfer.DTO
         public int? TaskID { get; set; }
         public int? DocumentId { get; set; }
         public string? Mes { get; set; }
+        public string? Subject { get; set; }
     }
 }

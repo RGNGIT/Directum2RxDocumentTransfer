@@ -19,6 +19,8 @@ namespace Directum2RxDocumentTransfer.DTO
         public class RemarksListLine 
         {
             public string Performer {  get; set; }
+            public int MarkDocId { get; set; }
+            public string MarkDocName { get; set; }
             public string Result { get; set; }
             public string Remark { get; set; }
         }

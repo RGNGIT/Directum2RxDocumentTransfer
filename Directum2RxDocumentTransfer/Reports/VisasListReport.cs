@@ -12,7 +12,7 @@ namespace Directum2RxDocumentTransfer.Reports
 {
     public class VisasListReport
     {
-        public void GetReportDataAndSendToDirectumRX(int? taskId, int? documentId, int? rabCode)
+        public void GetReportDataAndSendToDirectumRX(int? taskId, int? documentId, int? rabCode, string subject)
         {
             var reportData = new VisasEntities.VisasListData();
             reportData.MainDocument = documentId ?? -1;
@@ -32,7 +32,8 @@ namespace Directum2RxDocumentTransfer.Reports
                 }
             }
             // Найдем нейм документа
-            reportData.DocumentName = "Пока что тестовый Визас";
+            var splitName = subject.Split("Согласование");
+            reportData.DocumentName = splitName.Length >= 2 ? splitName[1].Trim() : subject;
             // Найдем все данные таблицы
             var visasCommonEntities = new List<VisasEntities.VisasItemCommonEntity>();
             using (var connection = SQL.SqlHandler.CreateNewConnection())
@@ -85,6 +86,9 @@ namespace Directum2RxDocumentTransfer.Reports
                     Result = v.Result
                 })
                 .ToList();
+
+            if (!approvers.Any() && !signatures.Any())
+                return;
 
             reportData.Approvers = approvers;
             reportData.Signatories = signatures;
