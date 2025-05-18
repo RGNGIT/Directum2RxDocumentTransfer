@@ -11,17 +11,34 @@ namespace Directum2RxDocumentTransfer.Reports
 {
     public class RemarksListReport
     {
-        public void GetReportDataAndSendToDirectumRX(int? taskId, int? documentId) 
+        public void GetReportDataAndSendToDirectumRX(int? taskId, int? documentId, string? subject) 
         {
+            Logger.Debug($"RemarksList. GetReportDataAndSendToDirectumRX. Processing document: {taskId}");
+
             var reportData = new RemarksEntities.RemarksListData();
             reportData.MainDocument = documentId ?? -1;
+
+            // Найдем нейм документа
+            if (!string.IsNullOrEmpty(subject))
+            {
+                var splitName = subject.Split("Согласование");
+                var header = splitName.Length >= 2 ? splitName[1].Trim() : subject;
+                reportData.DocumentName = header;
+
+                Logger.Debug($"RemarksList. GetReportDataAndSendToDirectumRX. Subject (header): {header}");
+            }
+            else
+            {
+                reportData.DocumentName = "";
+                Logger.Debug($"RemarksList. GetReportDataAndSendToDirectumRX. Subject was not defined.");
+            }
+
             var remarksListLinesEntities = new List<RemarksEntities.RemarksListLine>();
             using (var connection = SQL.SqlHandler.CreateNewConnection())
             {
                 connection.Open();
-                var commandText = string.Format(SQL.SqlCommands.RemarksListDataCommand, taskId);
-                Logger.Debug($"GetReportDataAndSendToDirectumRX. Query: {commandText}");
 
+                var commandText = string.Format(SQL.SqlCommands.RemarksListDataCommand, taskId);
                 using (SqlCommand command = new SqlCommand(commandText, connection))
                 {
                     command.CommandTimeout = 86400;
@@ -39,14 +56,14 @@ namespace Directum2RxDocumentTransfer.Reports
             }
 
             if (!remarksListLinesEntities.Any())
+            {
+                Logger.Debug($"RemarksList. GetReportDataAndSendToDirectumRX. Processing document {taskId} skipped. No lines found (perhaps no remarks).");
                 return;
-
-            // Найдем нейм документа
-            reportData.DocumentName = $"Пока что тестовый Ремарк {taskId}";
+            }
 
             reportData.Lines = remarksListLinesEntities;
             var sendResult = Networking.SendRequest(new RemarksEntities.RemarksWebRequest() { data = reportData }, Networking.Endpoint.Remarks).Result;
-            Logger.Debug($"GetReportDataAndSendToDirectumRX. ResultSent. Status: {sendResult}");
+            Logger.Debug($"RemarksList. GetReportDataAndSendToDirectumRX. Result sent. Status: {sendResult}");
         }
     }
 }

@@ -45,19 +45,17 @@ namespace Directum2RxDocumentTransfer.Utils
                 var response = await client.ExecuteAsync(request);
 
                 if (response.IsSuccessful)
-                {
                     return response.Content;
-                }
                 else
                 {
                     Logger.Debug($"SendRequest. Error: {response.Content}");
-                    return "Bullshit";
+                    return "Network error";
                 }
             }
             catch (System.Exception ex)
             {
                 Logger.Debug($"SendRequest. Exception: {ex.Message}");
-                return null;
+                return "Exception";
             }
         }
     }

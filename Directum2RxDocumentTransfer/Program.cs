@@ -57,7 +57,7 @@ namespace Directum2RxDocumentTransfer
             //    return;
 
             var remarksHandler = new RemarksListReport();
-            remarksHandler.GetReportDataAndSendToDirectumRX(item.TaskID, item.DocumentId);
+            remarksHandler.GetReportDataAndSendToDirectumRX(item.TaskID, item.DocumentId, item.Subject);
 
             //SQL.SqlHandler.InsertIntoSystemTable((int)item.TaskID!, "Remarks");
         }
@@ -77,8 +77,12 @@ namespace Directum2RxDocumentTransfer
         static void Main()
         {
             Initialize();
-            FormReports();
 
+            Misc.Timer.Start();
+            FormReports();
+            var timeElapsed = Misc.Timer.StopAndGetValue();
+
+            Logger.Debug($"Process ended. Time elapsed: {timeElapsed}");
             Console.ReadKey();
         }
     }

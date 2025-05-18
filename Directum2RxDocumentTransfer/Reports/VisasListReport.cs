@@ -7,22 +7,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Directum2RxDocumentTransfer.Reports
 {
     public class VisasListReport
     {
-        public void GetReportDataAndSendToDirectumRX(int? taskId, int? documentId, int? rabCode, string subject)
+        public void GetReportDataAndSendToDirectumRX(int? taskId, int? documentId, int? rabCode, string? subject)
         {
+            Logger.Debug($"VisasList. GetReportDataAndSendToDirectumRX. Processing document: {taskId}");
+
             var reportData = new VisasEntities.VisasListData();
             reportData.MainDocument = documentId ?? -1;
             // Найдем автора этого документа (инициатор задачи)
             using (var connection = SQL.SqlHandler.CreateNewConnection())
             {
                 connection.Open();
-                var commandText = string.Format(SQL.SqlCommands.TaskInitiatorScalarCommand, taskId);
-                Logger.Debug($"GetReportDataAndSendToDirectumRX. Query: {commandText}");
 
+                var commandText = string.Format(SQL.SqlCommands.TaskInitiatorScalarCommand, taskId);
                 using (SqlCommand command = new SqlCommand(commandText, connection))
                 {
                     command.CommandTimeout = 86400;
@@ -32,15 +34,26 @@ namespace Directum2RxDocumentTransfer.Reports
                 }
             }
             // Найдем нейм документа
-            var splitName = subject.Split("Согласование");
-            reportData.DocumentName = splitName.Length >= 2 ? splitName[1].Trim() : subject;
+            if (!string.IsNullOrEmpty(subject))
+            {
+                var splitName = subject.Split("Согласование");
+                var header = splitName.Length >= 2 ? splitName[1].Trim() : subject;
+                reportData.DocumentName = header;
+
+                Logger.Debug($"VisasList. GetReportDataAndSendToDirectumRX. Subject (header): {header}");
+            }
+            else
+            {
+                reportData.DocumentName = "";
+                Logger.Debug($"VisasList. GetReportDataAndSendToDirectumRX. Subject was not defined.");
+            }
+
             // Найдем все данные таблицы
             var visasCommonEntities = new List<VisasEntities.VisasItemCommonEntity>();
             using (var connection = SQL.SqlHandler.CreateNewConnection())
             {
                 connection.Open();
                 var commandText = string.Format(SQL.SqlCommands.VisasListDataCommand, taskId, rabCode);
-                Logger.Debug($"GetReportDataAndSendToDirectumRX. Query: {commandText}");
 
                 using (SqlCommand command = new SqlCommand(commandText, connection))
                 {
@@ -88,13 +101,16 @@ namespace Directum2RxDocumentTransfer.Reports
                 .ToList();
 
             if (!approvers.Any() && !signatures.Any())
+            {
+                Logger.Debug($"VisasList. GetReportDataAndSendToDirectumRX. Processing document {taskId} skipped. No approvers and signatures found.");
                 return;
+            }
 
             reportData.Approvers = approvers;
             reportData.Signatories = signatures;
 
             var sendResult = Networking.SendRequest(new VisasEntities.VisasWebRequest() { data = reportData }, Networking.Endpoint.Visas).Result;
-            Logger.Debug($"GetReportDataAndSendToDirectumRX. ResultSent. Status: {sendResult}");
+            Logger.Debug($"VisasList. GetReportDataAndSendToDirectumRX. Result sent. Status: {sendResult}");
         }
     }
 }
