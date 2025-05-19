@@ -69,8 +69,8 @@ namespace Directum2RxDocumentTransfer
             var data = formDataUtil.GetDataList();
             foreach (var item in data)
             {
-                FormVisasListReport(item);
-                // FormRemarksListReport(item);
+                // FormVisasListReport(item);
+                FormRemarksListReport(item);
             }
         }
 

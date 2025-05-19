@@ -37,10 +37,8 @@ namespace Directum2RxDocumentTransfer.Utils
                         while (reader.Read())
                             entityList.Add(new DTO.DataListEntity
                             {
-                                XRecID = reader.GetInt32(0),
+                                DocumentId = reader.GetInt32(0),
                                 TaskID = reader.IsDBNull(1) ? null : reader.GetInt32(1),
-                                DocumentId = reader.IsDBNull(2) ? null : reader.GetInt32(2),
-                                Mes = reader.IsDBNull(3) ? null : reader.GetString(3),
                                 Subject = reader.IsDBNull(4) ? null : reader.GetString(4)
                             });
                 }

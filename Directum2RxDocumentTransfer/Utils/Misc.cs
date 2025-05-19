@@ -29,9 +29,8 @@ namespace Directum2RxDocumentTransfer.Utils
             }
         }
 
-        public static string GetStringInEncoding(string rawString, string encoding) 
+        public static string GetStringInEncoding(byte[] encodedBytes, string encoding) 
         {
-            byte[] encodedBytes = Encoding.GetEncoding(encoding).GetBytes(rawString);
             return Encoding.GetEncoding(encoding).GetString(encodedBytes);
         }
     }

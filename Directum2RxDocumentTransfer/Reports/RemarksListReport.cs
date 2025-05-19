@@ -48,9 +48,9 @@ namespace Directum2RxDocumentTransfer.Reports
                             {
                                 Performer = reader.GetValue(0) as string,
                                 Result = reader.GetValue(1) as string,
-                                MarkDocId = reader.GetInt32(2),
+                                MarkDocId = !reader.IsDBNull(2) ? reader.GetInt32(2) : -1,
                                 MarkDocName = reader.GetValue(3) as string,
-                                Remark = reader.GetValue(4) != null ? Misc.GetStringInEncoding(reader.GetValue(4).ToString(), "Windows-1251") : null
+                                Remark = reader.GetValue(4) != null ? Misc.GetStringInEncoding(reader.GetValue(4) as byte[], "Windows-1251") : null
                             });
                 }
             }

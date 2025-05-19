@@ -74,7 +74,7 @@ namespace Directum2RxDocumentTransfer.Reports
             }
             // Выделяем аппруверов и подписантов
             var approvers = visasCommonEntities
-                .Where(v => v.Result == "Согласовано")
+                .Where(v => v.Result != "Подписано" && v.Result != "Отказать" && v.Result != "Утверждено")
                 .Select(v => new VisasEntities.VisasListApprover()
                 {
                     Visioner = v.Executor,
@@ -87,7 +87,7 @@ namespace Directum2RxDocumentTransfer.Reports
                 })
                 .ToList();
             var signatures = visasCommonEntities
-                .Where(v => v.Result == "Подписано")
+                .Where(v => v.Result == "Подписано" || v.Result == "Отказать" || v.Result == "Утверждено")
                 .Select(v => new VisasEntities.VisasListSignatory()
                 {
                     Signatory = v.Executor,
