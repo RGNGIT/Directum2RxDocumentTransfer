@@ -65,7 +65,7 @@ BEGIN
 END;";
 
             public static string FormListCommand = @"
-                SELECT DISTINCT TOP(10000) d.XRecID, a.TaskID, l.id, l.mes, t.Subject 
+                SELECT DISTINCT d.XRecID, a.TaskID, l.id, l.mes, d.Name 
                 FROM SBEDoc d
                 LEFT JOIN SBTaskAttach a ON d.XRecID = a.AttachID
                 LEFT JOIN SBTask t ON t.XRecID = a.TaskID
