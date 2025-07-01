@@ -1,5 +1,6 @@
 ﻿using Directum2RxDocumentTransfer.DTO;
 using Directum2RxDocumentTransfer.Utils;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -34,7 +35,7 @@ namespace Directum2RxDocumentTransfer.Reports
             }
 
             var remarksListLinesEntities = new List<RemarksEntities.RemarksListLine>();
-            using (var connection = SQL.SqlHandler.CreateNewConnection())
+            using (var connection = SQL.SqlHandler.CreateNewDirectumConnection())
             {
                 connection.Open();
 
@@ -62,7 +63,8 @@ namespace Directum2RxDocumentTransfer.Reports
             }
 
             reportData.Lines = remarksListLinesEntities;
-            var sendResult = Networking.SendRequest(new RemarksEntities.RemarksWebRequest() { data = reportData }, Networking.Endpoint.Remarks).Result;
+            // var sendResult = Networking.SendRequest(new RemarksEntities.RemarksWebRequest() { data = reportData }, Networking.Endpoint.Remarks).Result;
+            var sendResult = reportData.MainDocument != -1 ? SQL.SqlHandler.RunDirectumRxCommand(string.Format("UPDATE sungero_content_edoc SET remarkslistjso_russnef_centrvd = '{0}' WHERE xrecid = '{1}';", JsonConvert.SerializeObject(reportData), reportData.MainDocument)) : "No main document sent. Skip.";
             Logger.Debug($"RemarksList. GetReportDataAndSendToDirectumRX. Result sent. Status: {sendResult}");
         }
     }

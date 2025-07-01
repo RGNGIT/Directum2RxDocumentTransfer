@@ -11,13 +11,15 @@ namespace Directum2RxDocumentTransfer.Utils
     {
         public static class SqlHandler
         {
-            public static string? connectionString { get; set; } = string.Empty;
+            public static string? d5ConnectionString { get; set; } = string.Empty;
+            public static string? directumrxConnectionString { get; set; } = string.Empty;
 
-            public static SqlConnection CreateNewConnection() => new SqlConnection(connectionString);
+            public static SqlConnection CreateNewDirectumConnection() => new SqlConnection(d5ConnectionString);
+            public static SqlConnection CreateNewDirectumRxConnection() => new SqlConnection(directumrxConnectionString);
 
             public static void CreateSystemTableIfNotExists()
             {
-                using (var connection = CreateNewConnection())
+                using (var connection = CreateNewDirectumConnection())
                 {
                     connection.Open();
                     using (SqlCommand command = new SqlCommand(SqlCommands.CreateSystemTable, connection))
@@ -27,7 +29,7 @@ namespace Directum2RxDocumentTransfer.Utils
 
             public static void InsertIntoSystemTable(int taskId, string reportType)
             {
-                using (var connection = CreateNewConnection())
+                using (var connection = CreateNewDirectumConnection())
                 {
                     connection.Open();
                     using (SqlCommand command = new SqlCommand(string.Format(SqlCommands.InsertIntoSystemTable, taskId, reportType), connection))
@@ -35,9 +37,21 @@ namespace Directum2RxDocumentTransfer.Utils
                 }
             }
 
+            public static string RunDirectumRxCommand(string sqlCommand) 
+            {
+                using (var connection = CreateNewDirectumRxConnection())
+                {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(sqlCommand, connection))
+                        command.ExecuteNonQuery();
+                }
+
+                return "OK";
+            }
+
             public static bool ExistsInSystemTable(int taskId, string reportType) 
             {
-                using (var connection = CreateNewConnection())
+                using (var connection = CreateNewDirectumConnection())
                 {
                     connection.Open();
                     using (SqlCommand command = new SqlCommand(string.Format(SqlCommands.CountFromSystemTable, taskId, reportType), connection))

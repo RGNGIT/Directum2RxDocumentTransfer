@@ -24,7 +24,7 @@ namespace Directum2RxDocumentTransfer.Utils
         {
             var entityList = new List<DTO.DataListEntity>();
 
-            using (var connection = SQL.SqlHandler.CreateNewConnection())
+            using (var connection = SQL.SqlHandler.CreateNewDirectumConnection())
             {
                 connection.Open();
                 var commandText = string.Format(SQL.SqlCommands.FormListCommand, offset, limit);

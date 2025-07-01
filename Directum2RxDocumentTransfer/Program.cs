@@ -3,6 +3,7 @@ using Directum2RxDocumentTransfer.Reports;
 using Directum2RxDocumentTransfer.Utils;
 using System.Data.SqlTypes;
 using System.Xml;
+using System.Threading.Tasks;
 
 namespace Directum2RxDocumentTransfer
 {
@@ -16,9 +17,13 @@ namespace Directum2RxDocumentTransfer
             var xmlString = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.xml"));
             xmlDoc.LoadXml(xmlString);
 
-            Console.WriteLine("Установка строки подключения к БД...");
+            Console.WriteLine("Установка строки подключения к БД DIRECTUM...");
             var connectionStringNode = xmlDoc.SelectSingleNode("/Config/ConnectionString");
-            SQL.SqlHandler.connectionString = connectionStringNode?.InnerText;
+            SQL.SqlHandler.d5ConnectionString = connectionStringNode?.InnerText;
+
+            Console.WriteLine("Установка строки подключения к БД DirectumRX...");
+            var connectionStringDirectumRXNode = xmlDoc.SelectSingleNode("/Config/ConnectionStringRX");
+            SQL.SqlHandler.directumrxConnectionString = connectionStringDirectumRXNode?.InnerText;
 
             Console.WriteLine("Установка базового URL...");
             var baseUrlNode = xmlDoc.SelectSingleNode("/Config/BaseUrl");
@@ -69,7 +74,7 @@ namespace Directum2RxDocumentTransfer
             var data = formDataUtil.GetDataList();
             foreach (var item in data)
             {
-                // FormVisasListReport(item);
+                FormVisasListReport(item);
                 FormRemarksListReport(item);
             }
         }

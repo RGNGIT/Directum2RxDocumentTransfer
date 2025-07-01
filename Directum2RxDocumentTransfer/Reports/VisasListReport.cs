@@ -20,7 +20,7 @@ namespace Directum2RxDocumentTransfer.Reports
             var reportData = new VisasEntities.VisasListData();
             reportData.MainDocument = documentId ?? -1;
             // Найдем автора этого документа (инициатор задачи)
-            using (var connection = SQL.SqlHandler.CreateNewConnection())
+            using (var connection = SQL.SqlHandler.CreateNewDirectumConnection())
             {
                 connection.Open();
 
@@ -50,7 +50,7 @@ namespace Directum2RxDocumentTransfer.Reports
 
             // Найдем все данные таблицы
             var visasCommonEntities = new List<VisasEntities.VisasItemCommonEntity>();
-            using (var connection = SQL.SqlHandler.CreateNewConnection())
+            using (var connection = SQL.SqlHandler.CreateNewDirectumConnection())
             {
                 connection.Open();
                 var commandText = string.Format(SQL.SqlCommands.VisasListDataCommand, taskId, rabCode);
@@ -109,7 +109,8 @@ namespace Directum2RxDocumentTransfer.Reports
             reportData.Approvers = approvers;
             reportData.Signatories = signatures;
 
-            var sendResult = Networking.SendRequest(new VisasEntities.VisasWebRequest() { data = reportData }, Networking.Endpoint.Visas).Result;
+            // var sendResult = Networking.SendRequest(new VisasEntities.VisasWebRequest() { data = reportData }, Networking.Endpoint.Visas).Result;
+            var sendResult = reportData.MainDocument != -1 ? SQL.SqlHandler.RunDirectumRxCommand(string.Format("UPDATE sungero_content_edoc SET visaslistjsonc_russnef_centrvd = '{0}' WHERE xrecid = '{1}';", JsonConvert.SerializeObject(reportData), reportData.MainDocument)) : "No main document sent. Skip.";
             Logger.Debug($"VisasList. GetReportDataAndSendToDirectumRX. Result sent. Status: {sendResult}");
         }
     }
