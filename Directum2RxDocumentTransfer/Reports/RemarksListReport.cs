@@ -64,7 +64,14 @@ namespace Directum2RxDocumentTransfer.Reports
 
             reportData.Lines = remarksListLinesEntities;
             // var sendResult = Networking.SendRequest(new RemarksEntities.RemarksWebRequest() { data = reportData }, Networking.Endpoint.Remarks).Result;
-            var sendResult = reportData.MainDocument != -1 ? SQL.SqlHandler.RunDirectumRxCommand(string.Format("UPDATE sungero_content_edoc SET remarkslistjso_russnef_centrvd = '{0}' WHERE xrecid = '{1}';", JsonConvert.SerializeObject(reportData), reportData.MainDocument)) : "No main document sent. Skip.";
+            var sql = "UPDATE sungero_content_edoc SET remarkslistjso_russnef_centrvd = @json WHERE xrecid = @id";
+
+            var parameters = new Dictionary<string, object>
+            {
+                { "@json", JsonConvert.SerializeObject(reportData) },
+                { "@id", reportData.MainDocument }
+            };
+            var sendResult = reportData.MainDocument != -1 ? SQL.SqlHandler.RunDirectumRxCommand(sql, parameters) : "No main document sent. Skip.";
             Logger.Debug($"RemarksList. GetReportDataAndSendToDirectumRX. Result sent. Status: {sendResult}");
         }
     }

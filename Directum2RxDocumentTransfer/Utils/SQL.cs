@@ -37,13 +37,18 @@ namespace Directum2RxDocumentTransfer.Utils
                 }
             }
 
-            public static string RunDirectumRxCommand(string sqlCommand) 
+            public static string RunDirectumRxCommand(string sqlCommand, Dictionary<string, object> parameters)
             {
                 using (var connection = CreateNewDirectumRxConnection())
                 {
                     connection.Open();
                     using (SqlCommand command = new SqlCommand(sqlCommand, connection))
+                    {
+                        foreach (var param in parameters)
+                            command.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
+
                         command.ExecuteNonQuery();
+                    }
                 }
 
                 return "OK";

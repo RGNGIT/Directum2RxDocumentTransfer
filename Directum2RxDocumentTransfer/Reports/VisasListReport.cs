@@ -110,7 +110,14 @@ namespace Directum2RxDocumentTransfer.Reports
             reportData.Signatories = signatures;
 
             // var sendResult = Networking.SendRequest(new VisasEntities.VisasWebRequest() { data = reportData }, Networking.Endpoint.Visas).Result;
-            var sendResult = reportData.MainDocument != -1 ? SQL.SqlHandler.RunDirectumRxCommand(string.Format("UPDATE sungero_content_edoc SET visaslistjsonc_russnef_centrvd = '{0}' WHERE xrecid = '{1}';", JsonConvert.SerializeObject(reportData), reportData.MainDocument)) : "No main document sent. Skip.";
+            var sql = "UPDATE sungero_content_edoc SET visaslistjsonc_russnef_centrvd = @json WHERE xrecid = @id";
+
+            var parameters = new Dictionary<string, object>
+            {
+                { "@json", JsonConvert.SerializeObject(reportData) },
+                { "@id", reportData.MainDocument }
+            };
+            var sendResult = reportData.MainDocument != -1 ? SQL.SqlHandler.RunDirectumRxCommand(sql, parameters) : "No main document sent. Skip.";
             Logger.Debug($"VisasList. GetReportDataAndSendToDirectumRX. Result sent. Status: {sendResult}");
         }
     }
