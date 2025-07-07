@@ -1,9 +1,7 @@
 using Directum2RxDocumentTransfer.DTO;
 using Directum2RxDocumentTransfer.Reports;
 using Directum2RxDocumentTransfer.Utils;
-using System.Data.SqlTypes;
 using System.Xml;
-using System.Threading.Tasks;
 
 namespace Directum2RxDocumentTransfer
 {

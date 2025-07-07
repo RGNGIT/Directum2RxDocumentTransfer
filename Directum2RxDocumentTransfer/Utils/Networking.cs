@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
-using ABI.System;
-using Microsoft.VisualBasic.Logging;
-using System.Net.Http.Json;
-using Newtonsoft.Json;
-using System.Net.Mime;
+﻿using Newtonsoft.Json;
 using RestSharp;
 
 namespace Directum2RxDocumentTransfer.Utils

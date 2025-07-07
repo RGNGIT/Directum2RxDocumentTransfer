@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data.SqlClient;
+﻿using System.Data.SqlClient;
 
 namespace Directum2RxDocumentTransfer.Utils
 {
@@ -85,19 +80,16 @@ END;";
 
             public static string FormListCommand = @"
                 SELECT DISTINCT d.XRecID, a.TaskID, l.id, l.mes, d.Name 
-                FROM SBEDoc d
-                LEFT JOIN SBTaskAttach a ON d.XRecID = a.AttachID
-                LEFT JOIN SBTask t ON t.XRecID = a.TaskID
-                LEFT JOIN lists l ON l.docid = d.XRecID
-                WHERE d.Kind IN (1354042, 101731, 101733, 1046615, 102804, 101730, 1016457,
-                                101727, 378269, 116955, 102811, 102786, 832434, 215802, 101739)
-                AND t.StandardRoute IN (3793114, 1946646, 3726428, 385179, 814183, 385180, 2854901,
-                                      3753319, 113534, 2783244, 352255, 2361561, 104380, 2170042, 3000837,
-                                      2652158, 2652157, 113526, 2388218, 113533, 2997213, 2663968, 622583,
-                                      113532, 1969563, 206596, 2399164)
-                AND t.State = 'D'
-                AND l.id IS NULL
-                ORDER BY d.XRecID DESC;";
+FROM SBEDoc d
+LEFT JOIN SBTaskAttach a ON d.XRecID = a.AttachID
+LEFT JOIN SBTask t ON t.XRecID = a.TaskID
+LEFT JOIN lists l ON l.docid = d.XRecID
+WHERE 
+t.State = 'D'
+AND l.id IS NULL
+AND d.XRecID in (SELECT XRecID FROM DirectumRX3.dbo.Sungero_Content_EDoc)
+AND d.XRecID not in (SELECT XRecID FROM DirectumRX3.dbo.Sungero_Content_EDoc WHERE VisasListJsonC_Russnef_CentrVD is not null or RemarksListJso_Russnef_CentrVD is not null)
+ORDER BY d.XRecID DESC;";
             public static string TaskInitiatorScalarCommand = @"SELECT TOP(1) a.NameAn FROM MBAnalit a, SBTask b WHERE a.XRecID = b.Author AND b.XRecID = {0};";
 
             public static string RemarksListDataCommand = @"select u.Dop3, 

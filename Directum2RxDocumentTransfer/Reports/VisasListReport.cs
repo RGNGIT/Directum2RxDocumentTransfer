@@ -1,13 +1,7 @@
 ﻿using Directum2RxDocumentTransfer.DTO;
 using Directum2RxDocumentTransfer.Utils;
-using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Directum2RxDocumentTransfer.Reports
 {

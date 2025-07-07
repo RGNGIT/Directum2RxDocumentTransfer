@@ -1,11 +1,4 @@
-﻿using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Directum2RxDocumentTransfer.DTO
+﻿namespace Directum2RxDocumentTransfer.DTO
 {
     public static class VisasEntities
     {
